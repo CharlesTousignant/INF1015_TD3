@@ -1,0 +1,2 @@
+E:\Poly\INF1015\TD2\Debug\td2.exe
+E:\Poly\INF1015\TD2\Debug\td2.pdb
