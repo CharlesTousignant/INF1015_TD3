@@ -148,14 +148,11 @@ Film* lireFilm(istream& fichier, ListeFilms& listeFilms)
 	film->anneeSortie = lireUint16 (fichier);
 	film->recette     = lireUint16 (fichier);
 	film->acteurs.setNElements(lireUint8(fichier));
-	//NOTE: On aurait normalement fait le "new" au début de la fonction pour directement mettre les informations au bon endroit; on le fait ici pour que le code ci-dessus puisse être directement donné aux étudiants dans le TD2 sans qu'ils aient le "new" déjà écrit.  On aurait alors aussi un nom "film" pour le pointeur, pour suivre le guide de codage; on a mis un suffixe "p", contre le guide de codage, pour le différencier de "film".
+
 	cout << "Création Film " << film->titre << endl;
 	film->acteurs.createEmptyList(film->acteurs.getNElements());
-	for (shared_ptr<Acteur> &acteur : film->acteurs.spanListe()) {
-		
+	for (shared_ptr<Acteur>& acteur : film->acteurs.spanListe()) {
 		acteur = lireActeur(fichier, listeFilms);
-		cout << acteur << endl;
-		cout << acteur.use_count();
 		//acteur->joueDans.ajouterFilm(film);
 	}
 	return film;
@@ -255,11 +252,14 @@ void afficherListeFilms(const ListeFilms& listeFilms)
 //}
 
 ostream& operator<< (ostream& o, const Film& film) {
+	static const string ligneDeSeparation = //[
+		"\033[32m────────────────────────────────────────\033[0m\n";
 	string texteActeurs = "";
 	for (auto const& acteur : (film.acteurs.spanListe())) {
 		texteActeurs +=  "  " + acteur->nom + ", " + to_string(acteur->anneeNaissance) + " " + acteur->sexe + "\n";
 	}
-	return o << "Titre: " << film.titre << endl <<
+	return o << ligneDeSeparation <<
+				"Titre: " << film.titre << endl <<
 				"  Réalisateur: " << film.realisateur <<
 				"  Année :" << film.anneeSortie << endl <<
 				"  Recette: " << film.recette << "M$" << endl <<
@@ -281,12 +281,6 @@ int main()
 	// Le premier film de la liste.  Devrait être Alien.
 	afficherFilm(*listeFilms.enSpan()[0]);
 
-	ostringstream tamponStringStream;
-	tamponStringStream << *listeFilms.enSpan()[0] << * listeFilms.enSpan()[1];
-	string filmEnString = tamponStringStream.str();
-
-	cout << "Test avec ostringstream: " << filmEnString;
-
 
 	cout << ligneDeSeparation << "Les films sont:" << endl;
 	// Affiche la liste des films.  Il devrait y en avoir 7.
@@ -302,37 +296,52 @@ int main()
 	//	cout << acteur.get()->nom << ": " << acteur.use_count();
 	//}
 
+	cout << ligneDeSeparation << "Chapitre 7" << endl;
+	cout << "affichage de deux films: " << endl << *listeFilms[0] << *listeFilms[1];
+	ostringstream tamponStringStream;
+	tamponStringStream << *listeFilms[0] << *listeFilms[1];
+	string filmEnString = tamponStringStream.str();
+
+	cout << "Test avec ostringstream, devrait encore afficher les deux premiers films: \n" << filmEnString;
+
+
+	cout << ligneDeSeparation << "Chapitre 7-8 " << endl;
 	Film skylien = *listeFilms[0];
 	skylien.titre = "Skylien";
-	*skylien.acteurs.elements[0] = *listeFilms.enSpan()[1]->acteurs.elements[0];
-	skylien.acteurs.elements[0].get()->nom = "Daniel Wroughton Craig";
-	cout << "Skylien: " << endl;
+	skylien.acteurs[0] = listeFilms[1]->acteurs[0];
+	skylien.acteurs[0].get()->nom = "Daniel Wroughton Craig";
+	cout << "Skylien devrait avoir les memes informations que Alien a part le titre et le premier acteur: " << endl;
 	cout << skylien;
 
-	cout << "listeFilm[0]: " << endl;
+	cout << "listeFilm[0] devrait etre le meme film qu'avant (Alien): " << endl;
 	cout << *listeFilms[0];
 
-	cout << "listeFilm[1]: " << endl;
+	cout << "listeFilm[1] devrait etre le meme film qu'avant (Skyfall) avec le nouvel acteur " << endl;
 	cout << *listeFilms[1];
 
+
+	cout << ligneDeSeparation << "Chapitre 10 " << endl;
 	string filmCritere = listeFilms.trouverFilmQui([](Film film) {return film.recette == 955; });
-	cout << filmCritere;
+	cout << "Le film avec une recette de 955 est: " << filmCritere << endl;
 
 	
-	
+	cout << ligneDeSeparation << "Chapitre 9 " << endl;
 	Liste<string> listeTextes;
 	listeTextes.createEmptyList(2);
-	listeTextes.spanListe()[0] = make_shared<string>("chat");
-	listeTextes.spanListe()[1] = make_shared<string>("chien");
+	listeTextes.setNElements(2);
+
+	listeTextes[0] = make_shared<string>("string 0");
+	listeTextes[1] = make_shared<string>("string 1");
 	Liste<string> listeTextes2 = listeTextes;
-	listeTextes.spanListe()[0] = make_shared<string>("nouveau chat");
-	*listeTextes.spanListe()[1] = "chien modifie";
+	listeTextes[0] = make_shared<string>("nouvelle string 0");
+	*listeTextes[1] = "string 1 modifie";
 
 	cout << "ListeTextes[0]: " << *listeTextes[0] << endl;
 	cout << "ListeTextes[1]: " << *listeTextes[1] << endl;
 	cout << "ListeTextes2[0]: " << *listeTextes2[0] << endl;
 	cout << "ListeTextes2[1]: " << *listeTextes2[1] << endl;
 
+	cout << ligneDeSeparation;
 	// Détruit et enlève le premier film de la liste (Alien).
 	detruireFilm(listeFilms.enSpan()[0]);
 	listeFilms.enleverFilm(listeFilms.enSpan()[0]);

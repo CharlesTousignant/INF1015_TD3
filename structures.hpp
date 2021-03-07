@@ -40,14 +40,18 @@ template <typename T>
 class Liste {
 public:
 	Liste() = default;
-	Liste(T elementsAAjouter[], int nElementsAAjouter) {
-		createEmptyList(nElementsAAjouter);
-		//for (int i = 0; i < nElementsAAjouter; ++i) {
-		//	elements[i] = elementsAAjouter[i];
-		//}
-	}
 
-	Liste& operator=(const Liste& autre){
+	int getNElements() const { return nElements_; }
+	int getCapacite() const { return capacite_; }
+
+	void setNElements(unsigned int nElements) { nElements_ = nElements; };
+
+	void createEmptyList(unsigned nElements) {
+		elements = make_unique<shared_ptr<T>[]>(nElements);
+		capacite_ = nElements;
+	};
+
+	Liste<T>& operator=(const Liste<T>& autre){
 		nElements_ = autre.getNElements();
 		capacite_ = autre.getCapacite();
 		elements = make_unique<shared_ptr<T>[]>(nElements_);
@@ -57,27 +61,15 @@ public:
 		return *this;
 	}
 
-	Liste(Liste& autre) {
+	Liste<T> (Liste<T>& autre) {
 		*this = move(autre);
 	}
-	unique_ptr<shared_ptr<T>[]> elements;
 
-	
-	int getNElements() const { return nElements_;}
-	int getCapacite() const { return capacite_;}
-
-	void setNElements(int nElements) { nElements_ = nElements; }
-	void setCapacite(int capacite) { capacite_ = capacite; }
-
-	shared_ptr<T> operator[](int i) { return spanListe()[i]; }
+	shared_ptr<T>& operator[](int i) { return spanListe()[i]; }
 	span<shared_ptr<T>> spanListe() const { return span(elements.get(), nElements_); }
-
-	void createEmptyList(unsigned nElements){
-		elements = make_unique<shared_ptr<T>[]>(nElements);
-		capacite_ = nElements;
-	};
 private:
-	int capacite_ = 0, nElements_ = 0;
+	unsigned int capacite_ = 0, nElements_ = 0;
+	unique_ptr<shared_ptr<T>[]> elements;
 };
 
 
@@ -97,8 +89,6 @@ struct Film
 	std::string titre, realisateur; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 	int anneeSortie = 0, recette = 0; // Année de sortie et recette globale du film en millions de dollars
 	ListeActeur acteurs;
-
-
 
 	friend ostream& operator<< (ostream& o, const Film& film);
 };
