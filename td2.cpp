@@ -1,5 +1,7 @@
-﻿// Solutionnaire du TD2 INF1015 hiver 2021
-// Par Francois-R.Boyer@PolyMtl.ca
+﻿// TP3 INF1015 Hiver 2021
+// Par: Charles Tousignant		2087807
+//		Ahmed Sidi Ould Ahmedou 2001565
+
 
 #pragma region "Includes"//{
 #define _CRT_SECURE_NO_WARNINGS // On permet d'utiliser les fonctions de copies de chaînes qui sont considérées non sécuritaires.
@@ -287,10 +289,22 @@ int main()
 	// Affiche la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
 	//afficherFilmographieActeur(listeFilms, "Benedict Cumberbatch");
 	
-	for (auto& acteur : listeFilms.enSpan()[2]->acteurs.spanListeActeurs()) {
-		cout << acteur.get()->nom << ": " << acteur.use_count();
-	}
+	//for (auto& acteur : listeFilms.enSpan()[2]->acteurs.spanListeActeurs()) {
+	//	cout << acteur.get()->nom << ": " << acteur.use_count();
+	//}
 
+	Film skylien = *listeFilms[0];
+	skylien.titre = "Skylien";
+	*skylien.acteurs.elements[0] = *listeFilms.enSpan()[0]->acteurs.elements[0];
+	skylien.acteurs.elements[0].get()->nom = "Daniel Wroughton Craig";
+	cout << "Skylien: " << endl;
+	afficherFilm(skylien);
+
+	cout << "listeFilm[0]: " << endl;
+	afficherFilm(*listeFilms.enSpan()[0]);
+
+	cout << "listeFilm[1]: " << endl;
+	afficherFilm(*listeFilms.enSpan()[1]);
 
 	// Détruit et enlève le premier film de la liste (Alien).
 	detruireFilm(listeFilms.enSpan()[0]);

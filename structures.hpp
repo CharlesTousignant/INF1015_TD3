@@ -21,6 +21,8 @@ public:
 	span<Film*> enSpan() const;
 	int size() const { return nElements; }
 	void detruire(bool possedeLesFilms = false);
+	
+	Film* operator[](int i) { return enSpan()[i]; }
 
 private:
 	void changeDimension(int nouvelleCapacite);
@@ -32,17 +34,29 @@ private:
 class ListeActeurs {
 public:
 	ListeActeurs() = default;
-	~ListeActeurs() {
+	ListeActeurs& operator=(const ListeActeurs& autre){
+		nElements_ = autre.getNElements();
+		capacite_ = autre.getCapacite();
+		elements = make_unique<shared_ptr<Acteur>[]>(nElements_);
+		for (int i = 0; i < nElements_; ++i) {	
+			elements[i] = autre.elements[i];
+		}
+
+		return *this;
+	}
+
+
+	/*~ListeActeurs() {
 		for (auto& acteur : spanListeActeurs()) {
 			acteur = nullptr;
 		}
 		elements = nullptr;
-	}
+	}*/
 	unique_ptr<shared_ptr<Acteur>[]> elements;
 
 	
-	int getNElements() { return nElements_;}
-	int getCapacite() { return capacite_;}
+	int getNElements() const { return nElements_;}
+	int getCapacite() const { return capacite_;}
 
 	void setNElements(int nElements) { nElements_ = nElements; }
 	void setCapacite(int capacite) { capacite_ = capacite; }
@@ -61,10 +75,21 @@ private:
 
 
 struct Film
-{	
+{
+	Film() = default;
+	Film(const Film& autre) {
+		titre = autre.titre;
+		realisateur = autre.realisateur;
+		anneeSortie = autre.anneeSortie;
+		recette = autre.recette;
+		acteurs = autre.acteurs;
+	}
+
 	std::string titre, realisateur; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 	int anneeSortie = 0, recette = 0; // Année de sortie et recette globale du film en millions de dollars
 	ListeActeurs acteurs;
+
+
 
 	friend ostream& operator<< (ostream& o, const Film& film);
 };
