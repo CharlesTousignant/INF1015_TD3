@@ -113,7 +113,7 @@ string ListeFilms::trouverFilmQui(const function<bool(Film film)>& critere) {
 shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nomActeur) const
 {
 	for (const Film* film : enSpan()) {
-		for (shared_ptr<Acteur> acteur : film->acteurs.spanListe()) {
+		for (shared_ptr<Acteur> acteur : film->acteurs.enSpan()) {
 			if (acteur->nom == nomActeur)
 				return acteur;
 		}
@@ -150,8 +150,8 @@ Film* lireFilm(istream& fichier, ListeFilms& listeFilms)
 	film->acteurs.setNElements(lireUint8(fichier));
 
 	cout << "Création Film " << film->titre << endl;
-	film->acteurs.createEmptyList(film->acteurs.getNElements());
-	for (shared_ptr<Acteur>& acteur : film->acteurs.spanListe()) {
+	film->acteurs.allocateElements(film->acteurs.getNElements());
+	for (shared_ptr<Acteur>& acteur : film->acteurs.enSpan()) {
 		acteur = lireActeur(fichier, listeFilms);
 		//acteur->joueDans.ajouterFilm(film);
 	}
@@ -226,7 +226,7 @@ void afficherFilm(const Film& film)
 	cout << "  Recette: " << film.recette << "M$" << endl;
 
 	cout << "Acteurs:" << endl;
-	for (auto const &acteur : (film.acteurs.spanListe()))
+	for (auto const &acteur : (film.acteurs.enSpan()))
 		afficherActeur(*acteur);
 }
 //]
@@ -251,11 +251,12 @@ void afficherListeFilms(const ListeFilms& listeFilms)
 //		afficherListeFilms(acteur->joueDans);
 //}
 
+
 ostream& operator<< (ostream& o, const Film& film) {
 	static const string ligneDeSeparation = //[
 		"\033[32m────────────────────────────────────────\033[0m\n";
 	string texteActeurs = "";
-	for (auto const& acteur : (film.acteurs.spanListe())) {
+	for (auto const& acteur : (film.acteurs.enSpan())) {
 		texteActeurs +=  "  " + acteur->nom + ", " + to_string(acteur->anneeNaissance) + " " + acteur->sexe + "\n";
 	}
 	return o << ligneDeSeparation <<
@@ -292,9 +293,6 @@ int main()
 	// Affiche la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
 	//afficherFilmographieActeur(listeFilms, "Benedict Cumberbatch");
 	
-	//for (auto& acteur : listeFilms.enSpan()[2]->acteurs.spanListeActeurs()) {
-	//	cout << acteur.get()->nom << ": " << acteur.use_count();
-	//}
 
 	cout << ligneDeSeparation << "Chapitre 7" << endl;
 	cout << "affichage de deux films: " << endl << *listeFilms[0] << *listeFilms[1];
@@ -326,10 +324,12 @@ int main()
 
 	
 	cout << ligneDeSeparation << "Chapitre 9 " << endl;
+	//On cree une Liste<string> vide avec deux elements
 	Liste<string> listeTextes;
-	listeTextes.createEmptyList(2);
+	listeTextes.allocateElements(2);
 	listeTextes.setNElements(2);
 
+	//On 
 	listeTextes[0] = make_shared<string>("string 0");
 	listeTextes[1] = make_shared<string>("string 1");
 	Liste<string> listeTextes2 = listeTextes;

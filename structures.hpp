@@ -1,5 +1,6 @@
-// Solutionnaire du TD2 INF1015 hiver 2021
-// Par Francois-R.Boyer@PolyMtl.ca
+// TP3 INF1015 Hiver 2021
+// Par: Charles Tousignant		2087807
+//		Ahmed Sidi Ould Ahmedou 2001565
 #pragma once
 // Structures mémoires pour une collection de films.
 
@@ -46,7 +47,7 @@ public:
 
 	void setNElements(unsigned int nElements) { nElements_ = nElements; };
 
-	void createEmptyList(unsigned nElements) {
+	void allocateElements(unsigned nElements) {
 		elements = make_unique<shared_ptr<T>[]>(nElements);
 		capacite_ = nElements;
 	};
@@ -65,8 +66,8 @@ public:
 		*this = move(autre);
 	}
 
-	shared_ptr<T>& operator[](int i) { return spanListe()[i]; }
-	span<shared_ptr<T>> spanListe() const { return span(elements.get(), nElements_); }
+	shared_ptr<T>& operator[](int i) { return enSpan()[i]; }
+	span<shared_ptr<T>> enSpan() const { return span(elements.get(), nElements_); }
 private:
 	unsigned int capacite_ = 0, nElements_ = 0;
 	unique_ptr<shared_ptr<T>[]> elements;
