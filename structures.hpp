@@ -5,6 +5,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 #include "gsl/span"
 
 using namespace std;
@@ -22,8 +23,10 @@ public:
 	int size() const { return nElements; }
 	void detruire(bool possedeLesFilms = false);
 	
+
 	Film* operator[](int i) { return enSpan()[i]; }
 
+	string trouverFilmQui(const function<bool(Film film)>& critere);
 private:
 	void changeDimension(int nouvelleCapacite);
 

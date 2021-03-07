@@ -17,6 +17,7 @@
 #include <string>
 #include <limits>
 #include <algorithm>
+#include <functional>
 #include "cppitertools/range.hpp"
 #include "gsl/span"
 #include "debogage_memoire.hpp"        // Ajout des numéros de ligne des "new" dans le rapport de fuites.  Doit être après les include du système, qui peuvent utiliser des "placement new" (non supporté par notre ajout de numéros de lignes).
@@ -93,6 +94,15 @@ void ListeFilms::enleverFilm(const Film* film)
 			return;
 		}
 	}
+}
+
+string ListeFilms::trouverFilmQui(const function<bool(Film film)>& critere) {
+	for (int i = 0; i < nElements; ++i) {
+		if (critere(*elements[i]))
+			return elements[i]->titre;
+	}
+
+	return "Aucun film trouve";
 }
 //]
 
@@ -298,13 +308,16 @@ int main()
 	*skylien.acteurs.elements[0] = *listeFilms.enSpan()[0]->acteurs.elements[0];
 	skylien.acteurs.elements[0].get()->nom = "Daniel Wroughton Craig";
 	cout << "Skylien: " << endl;
-	afficherFilm(skylien);
+	cout << skylien;
 
 	cout << "listeFilm[0]: " << endl;
-	afficherFilm(*listeFilms.enSpan()[0]);
+	cout << *listeFilms[0];
 
 	cout << "listeFilm[1]: " << endl;
-	afficherFilm(*listeFilms.enSpan()[1]);
+	cout << *listeFilms[1];
+
+	string filmCritere = listeFilms.trouverFilmQui([](Film film) {return film.recette == 955; });
+	cout << filmCritere;
 
 	// Détruit et enlève le premier film de la liste (Alien).
 	detruireFilm(listeFilms.enSpan()[0]);
