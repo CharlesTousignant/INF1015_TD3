@@ -11,7 +11,9 @@
 using namespace std;
 using gsl::span;
 
+
 struct Film; struct Acteur; // Permet d'utiliser les types alors qu'ils seront défini après.
+#define ListeActeur Liste<Acteur>
 
 class ListeFilms {
 public:
@@ -34,28 +36,31 @@ private:
 	Film** elements = nullptr; // Pointeur vers un tableau de Film*, chaque Film* pointant vers un Film.
 };
 
-class ListeActeurs {
+template <typename T>
+class Liste {
 public:
-	ListeActeurs() = default;
-	ListeActeurs& operator=(const ListeActeurs& autre){
+	Liste() = default;
+	Liste(T elementsAAjouter[], int nElementsAAjouter) {
+		createEmptyList(nElementsAAjouter);
+		//for (int i = 0; i < nElementsAAjouter; ++i) {
+		//	elements[i] = elementsAAjouter[i];
+		//}
+	}
+
+	Liste& operator=(const Liste& autre){
 		nElements_ = autre.getNElements();
 		capacite_ = autre.getCapacite();
-		elements = make_unique<shared_ptr<Acteur>[]>(nElements_);
+		elements = make_unique<shared_ptr<T>[]>(nElements_);
 		for (int i = 0; i < nElements_; ++i) {	
 			elements[i] = autre.elements[i];
 		}
-
 		return *this;
 	}
 
-
-	/*~ListeActeurs() {
-		for (auto& acteur : spanListeActeurs()) {
-			acteur = nullptr;
-		}
-		elements = nullptr;
-	}*/
-	unique_ptr<shared_ptr<Acteur>[]> elements;
+	Liste(Liste& autre) {
+		*this = move(autre);
+	}
+	unique_ptr<shared_ptr<T>[]> elements;
 
 	
 	int getNElements() const { return nElements_;}
@@ -64,10 +69,11 @@ public:
 	void setNElements(int nElements) { nElements_ = nElements; }
 	void setCapacite(int capacite) { capacite_ = capacite; }
 
-	span<shared_ptr<Acteur>> spanListeActeurs() const { return span(elements.get(), nElements_); }
+	shared_ptr<T> operator[](int i) { return spanListe()[i]; }
+	span<shared_ptr<T>> spanListe() const { return span(elements.get(), nElements_); }
 
 	void createEmptyList(unsigned nElements){
-		elements = make_unique<shared_ptr<Acteur>[]>(nElements);
+		elements = make_unique<shared_ptr<T>[]>(nElements);
 		capacite_ = nElements;
 	};
 private:
@@ -90,7 +96,7 @@ struct Film
 
 	std::string titre, realisateur; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 	int anneeSortie = 0, recette = 0; // Année de sortie et recette globale du film en millions de dollars
-	ListeActeurs acteurs;
+	ListeActeur acteurs;
 
 
 

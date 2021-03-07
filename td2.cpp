@@ -24,7 +24,6 @@
 using namespace std;
 using namespace iter;
 using namespace gsl;
-
 #pragma endregion//}
 
 typedef uint8_t UInt8;
@@ -114,7 +113,7 @@ string ListeFilms::trouverFilmQui(const function<bool(Film film)>& critere) {
 shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nomActeur) const
 {
 	for (const Film* film : enSpan()) {
-		for (shared_ptr<Acteur> acteur : film->acteurs.spanListeActeurs()) {
+		for (shared_ptr<Acteur> acteur : film->acteurs.spanListe()) {
 			if (acteur->nom == nomActeur)
 				return acteur;
 		}
@@ -152,7 +151,7 @@ Film* lireFilm(istream& fichier, ListeFilms& listeFilms)
 	//NOTE: On aurait normalement fait le "new" au début de la fonction pour directement mettre les informations au bon endroit; on le fait ici pour que le code ci-dessus puisse être directement donné aux étudiants dans le TD2 sans qu'ils aient le "new" déjà écrit.  On aurait alors aussi un nom "film" pour le pointeur, pour suivre le guide de codage; on a mis un suffixe "p", contre le guide de codage, pour le différencier de "film".
 	cout << "Création Film " << film->titre << endl;
 	film->acteurs.createEmptyList(film->acteurs.getNElements());
-	for (shared_ptr<Acteur> &acteur : film->acteurs.spanListeActeurs()) {
+	for (shared_ptr<Acteur> &acteur : film->acteurs.spanListe()) {
 		
 		acteur = lireActeur(fichier, listeFilms);
 		cout << acteur << endl;
@@ -230,7 +229,7 @@ void afficherFilm(const Film& film)
 	cout << "  Recette: " << film.recette << "M$" << endl;
 
 	cout << "Acteurs:" << endl;
-	for (auto const &acteur : (film.acteurs.spanListeActeurs()))
+	for (auto const &acteur : (film.acteurs.spanListe()))
 		afficherActeur(*acteur);
 }
 //]
@@ -257,7 +256,7 @@ void afficherListeFilms(const ListeFilms& listeFilms)
 
 ostream& operator<< (ostream& o, const Film& film) {
 	string texteActeurs = "";
-	for (auto const& acteur : (film.acteurs.spanListeActeurs())) {
+	for (auto const& acteur : (film.acteurs.spanListe())) {
 		texteActeurs +=  "  " + acteur->nom + ", " + to_string(acteur->anneeNaissance) + " " + acteur->sexe + "\n";
 	}
 	return o << "Titre: " << film.titre << endl <<
@@ -305,7 +304,7 @@ int main()
 
 	Film skylien = *listeFilms[0];
 	skylien.titre = "Skylien";
-	*skylien.acteurs.elements[0] = *listeFilms.enSpan()[0]->acteurs.elements[0];
+	*skylien.acteurs.elements[0] = *listeFilms.enSpan()[1]->acteurs.elements[0];
 	skylien.acteurs.elements[0].get()->nom = "Daniel Wroughton Craig";
 	cout << "Skylien: " << endl;
 	cout << skylien;
@@ -318,6 +317,21 @@ int main()
 
 	string filmCritere = listeFilms.trouverFilmQui([](Film film) {return film.recette == 955; });
 	cout << filmCritere;
+
+	
+	
+	Liste<string> listeTextes;
+	listeTextes.createEmptyList(2);
+	listeTextes.spanListe()[0] = make_shared<string>("chat");
+	listeTextes.spanListe()[1] = make_shared<string>("chien");
+	Liste<string> listeTextes2 = listeTextes;
+	listeTextes.spanListe()[0] = make_shared<string>("nouveau chat");
+	*listeTextes.spanListe()[1] = "chien modifie";
+
+	cout << "ListeTextes[0]: " << *listeTextes[0] << endl;
+	cout << "ListeTextes[1]: " << *listeTextes[1] << endl;
+	cout << "ListeTextes2[0]: " << *listeTextes2[0] << endl;
+	cout << "ListeTextes2[1]: " << *listeTextes2[1] << endl;
 
 	// Détruit et enlève le premier film de la liste (Alien).
 	detruireFilm(listeFilms.enSpan()[0]);
